@@ -1,0 +1,43 @@
+Use web_search to discover current opportunities, then use web_fetch to verify the official source pages.
+
+Find current Auckland and New Zealand opportunities suitable for a University of Auckland undergraduate Computer Science student.
+
+Search for:
+1. University of Auckland technology events and programmes
+2. Auckland AI, software, cybersecurity, data, cloud, and developer events
+3. Hackathons, workshops, coding competitions, and technical meetups
+4. Undergraduate internships, scholarships, summer research, student programmes, and volunteering
+5. Beginner-friendly networking and career opportunities
+
+Search recent and official sources where possible.
+
+Requirements:
+1. Return up to 8 strong opportunities.
+2. Include only opportunities that are open, upcoming, or still actionable on the current date.
+3. Prefer Auckland-based or online opportunities accessible from Auckland.
+4. Exclude expired opportunities.
+5. Exclude events aimed mainly at children, senior executives, HR professionals, or experienced specialists.
+6. Verify dates, eligibility, location, and source links before including an opportunity.
+7. Do not invent information.
+8. Every opportunity must include a direct source link.
+9. Separate opportunities using exactly:
+===OPPORTUNITY===
+10. Do not include an introduction, conclusion, markdown table, code fence, reasoning, or commentary.
+11. If no strong opportunities are found, output exactly:
+NO_STRONG_MATCHES
+
+Use exactly this format:
+
+Title: ...
+Type: ...
+Where: ...
+Date/Deadline: ...
+Why fit: ...
+Next step: ...
+Source link: ...
+Relevance: x/5
+Beginner Fit: x/5
+Career Value: x/5
+Practicality: x/5
+University Fit: x/5
+Total Score: x/25

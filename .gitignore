@@ -1,0 +1,118 @@
+# ============================================================
+# NZ Student Opportunity OS
+# Runtime and private files
+# ============================================================
+
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+
+# ============================================================
+# Runtime logs
+# ============================================================
+
+logs/
+
+
+# ============================================================
+# OpenClaw runtime inputs
+# ============================================================
+
+incoming/openclaw_raw.txt
+incoming/openclaw_cleaned.txt
+incoming/openclaw_approved.txt
+incoming/openclaw_needs_review.txt
+incoming/openclaw_rejected.txt
+incoming/openclaw_active.txt
+incoming/openclaw_lifecycle_review.txt
+incoming/openclaw_batch.txt
+incoming/openclaw_batch_migrated.txt
+incoming/openclaw_cleaned_pre_publish_backup.txt
+
+incoming/validator_*.txt
+incoming/legacy_*.txt
+
+
+# ============================================================
+# Generated opportunity data
+# ============================================================
+
+opportunities/deduplicated_ranked_output.json
+opportunities/opportunities.csv
+opportunities/weekly_summary.md
+
+opportunities/history/
+opportunities/history_changes/
+opportunities/archive/
+
+opportunities/lifecycle_backups/
+opportunities/transaction_backups/
+opportunities/migration_backups/
+
+
+# ============================================================
+# Generated input archive
+# ============================================================
+
+input/archive/
+input/opportunities.txt
+
+
+# ============================================================
+# Day development backups
+# ============================================================
+
+web/*_pre_day*.html
+web/*_pre_day*.js
+web/*_pre_day*.css
+
+automation/*_pre_*.ps1
+
+
+# ============================================================
+# OS / editor
+# ============================================================
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+
+
+# ============================================================
+# Temporary files
+# ============================================================
+
+*.tmp
+*.bak
+*.log
+
+# ============================================================
+# Legacy development artifacts
+# ============================================================
+
+incoming/*_backup.txt
+incoming/*_pre_day*.txt
+
+opportunities/custom_result.json
+opportunities/custom_summary.md
+opportunities/ranked_output.json
+opportunities/sample_output.json
+
+src/None

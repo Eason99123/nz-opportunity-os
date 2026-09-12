@@ -1,0 +1,41 @@
+Title: Auckland Student Technology Meetup
+Type: Networking Event
+Where: Auckland, New Zealand
+Date/Deadline: Example event
+Why fit: A sample technology networking opportunity for students interested in software development and technology careers.
+Next step: Visit the official event page and confirm current details.
+Source link: https://example.com/technology-meetup
+Relevance: 4/5
+Beginner Fit: 5/5
+Career Value: 4/5
+Practicality: 5/5
+University Fit: 4/5
+Total Score: 22/25
+
+Title: Junior Software Project Programme
+Type: Student Programme
+Where: Auckland, New Zealand
+Date/Deadline: Example application period
+Why fit: A sample programme showing how NZ Student Opportunity OS ranks early career software opportunities.
+Next step: Review programme eligibility and prepare an application.
+Source link: https://example.com/student-programme
+Relevance: 5/5
+Beginner Fit: 5/5
+Career Value: 5/5
+Practicality: 4/5
+University Fit: 5/5
+Total Score: 24/25
+
+Title: University AI Workshop
+Type: Workshop
+Where: Auckland, New Zealand
+Date/Deadline: Example workshop
+Why fit: A beginner friendly sample workshop focused on practical AI and software development skills.
+Next step: Confirm registration details with the event organiser.
+Source link: https://example.com/ai-workshop
+Relevance: 4/5
+Beginner Fit: 5/5
+Career Value: 4/5
+Practicality: 5/5
+University Fit: 5/5
+Total Score: 23/25

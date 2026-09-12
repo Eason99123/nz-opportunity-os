@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NZ Student Opportunity OS</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body>
+
+<main class="page-shell">
+
+    <header class="page-header">
+
+        <h1>NZ Student Opportunity OS</h1>
+
+        <p class="subtitle">
+            Weekly ranked opportunities for a CS student in Auckland.
+        </p>
+
+        <p class="meta-line">
+            Last updated:
+            <span id="page-last-updated">
+                loading...
+            </span>
+        </p>
+
+        <p class="meta-line">
+            Data source:
+            <strong>
+                Live backend data
+            </strong>
+        </p>
+
+    </header>
+
+
+    <section class="panel">
+
+        <div class="top-banner banner-success">
+            Viewing live backend data
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>System Health</h2>
+
+                <p class="section-description">
+                    Latest automation, validation, lifecycle and rollback status.
+                </p>
+
+            </div>
+
+            <button
+                id="refresh-health-button"
+                class="button secondary-button"
+                type="button"
+            >
+                Refresh Health
+            </button>
+
+        </div>
+
+
+        <div
+            id="system-health-banner"
+            class="health-banner health-loading"
+        >
+            Loading system health...
+        </div>
+
+
+        <div class="status-grid health-summary-grid">
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Last Weekly Run
+                </div>
+
+                <div
+                    id="health-last-run"
+                    class="status-value status-value-small"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Last Successful Run
+                </div>
+
+                <div
+                    id="health-last-success"
+                    class="status-value status-value-small"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Run Duration
+                </div>
+
+                <div
+                    id="health-duration"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Production Entries
+                </div>
+
+                <div
+                    id="health-production"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div
+                    id="run-stage-label"
+                    class="status-label"
+                >
+                    Run Stage
+                </div>
+
+                <div
+                    id="health-failure-stage"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Rollback Performed
+                </div>
+
+                <div
+                    id="health-rollback"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <div class="subsection">
+
+            <h3>Validation</h3>
+
+            <div class="status-grid three-columns">
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Approved
+                    </div>
+
+                    <div
+                        id="health-approved"
+                        class="status-value status-green"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Needs Review
+                    </div>
+
+                    <div
+                        id="health-review"
+                        class="status-value status-orange"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Rejected
+                    </div>
+
+                    <div
+                        id="health-rejected"
+                        class="status-value status-red"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+
+        <div class="subsection">
+
+            <h3>Lifecycle</h3>
+
+            <div class="status-grid three-columns">
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Active
+                    </div>
+
+                    <div
+                        id="health-active"
+                        class="status-value status-green"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Uncertain
+                    </div>
+
+                    <div
+                        id="health-uncertain"
+                        class="status-value status-orange"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+
+                <article class="status-card">
+
+                    <div class="status-label">
+                        Expired
+                    </div>
+
+                    <div
+                        id="health-expired"
+                        class="status-value"
+                    >
+                        loading...
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+
+        <div class="subsection">
+
+            <h3>Component Health</h3>
+
+            <div
+                id="component-health-list"
+                class="component-health-list"
+            >
+                Loading component health...
+            </div>
+
+        </div>
+
+
+        <div class="health-issues">
+
+            <strong>
+                Health Issues
+            </strong>
+
+            <div id="health-issues">
+                loading...
+            </div>
+
+        </div>
+
+
+        <div class="health-details">
+
+            <div>
+                <strong>Run status:</strong>
+
+                <span id="health-run-status">
+                    loading...
+                </span>
+            </div>
+
+            <div>
+                <strong>Transaction backup:</strong>
+
+                <span id="health-transaction-backup">
+                    loading...
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>Latest Refresh Status</h2>
+
+                <p class="section-description">
+                    Latest generation of live opportunity data.
+                </p>
+
+            </div>
+
+            <a
+                class="button secondary-button"
+                href="../logs/latest_refresh_status.txt"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Open Refresh Log
+            </a>
+
+        </div>
+
+
+        <div class="status-grid three-columns">
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Refresh Status
+                </div>
+
+                <div
+                    id="refresh-status"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Started
+                </div>
+
+                <div
+                    id="refresh-started"
+                    class="status-value status-value-small"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Finished
+                </div>
+
+                <div
+                    id="refresh-finished"
+                    class="status-value status-value-small"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div>
+                <strong>Message:</strong>
+
+                <span id="refresh-message">
+                    loading...
+                </span>
+            </div>
+
+            <div>
+                <strong>Latest history JSON:</strong>
+
+                <span id="refresh-history-json">
+                    loading...
+                </span>
+            </div>
+
+            <div>
+                <strong>Latest changes JSON:</strong>
+
+                <span id="refresh-changes-json">
+                    loading...
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>Current Batch Status</h2>
+
+                <p class="section-description">
+                    Current production opportunities after validation and lifecycle filtering.
+                </p>
+
+            </div>
+
+            <div class="button-row">
+
+                <a
+                    class="button secondary-button"
+                    href="../logs/latest_batch_status.json"
+                    target="_blank"
+                >
+                    Open Batch JSON
+                </a>
+
+                <a
+                    class="button secondary-button"
+                    href="../incoming/openclaw_batch.txt"
+                    target="_blank"
+                >
+                    Open Batch TXT
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="batch-workflow-state"
+            class="workflow-badge"
+        >
+            Loading workflow state...
+        </div>
+
+
+        <div class="status-grid three-columns">
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Batch Exists
+                </div>
+
+                <div
+                    id="batch-exists"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Batch Entries
+                </div>
+
+                <div
+                    id="batch-entries"
+                    class="status-value"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+
+            <article class="status-card">
+
+                <div class="status-label">
+                    Batch Updated
+                </div>
+
+                <div
+                    id="batch-updated"
+                    class="status-value status-value-small"
+                >
+                    loading...
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div>
+                <strong>Batch file:</strong>
+
+                <span id="batch-file">
+                    loading...
+                </span>
+            </div>
+
+            <div>
+                <strong>Status generated:</strong>
+
+                <span id="batch-generated">
+                    loading...
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="subsection">
+
+            <h3>Production Titles</h3>
+
+            <div id="batch-title-list">
+                Loading titles...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>Live Opportunities</h2>
+
+                <p class="section-description">
+                    Ranked current opportunities from the production pipeline.
+                </p>
+
+            </div>
+
+            <div class="summary-number">
+
+                <span id="visible-count">
+                    0
+                </span>
+
+                visible
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-grid">
+
+            <label class="filter-control">
+
+                <span>Search</span>
+
+                <input
+                    id="search-input"
+                    type="search"
+                    placeholder="Search title, type, location..."
+                >
+
+            </label>
+
+
+            <label class="filter-control">
+
+                <span>Type</span>
+
+                <select id="type-filter">
+
+                    <option value="">
+                        All Types
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label class="filter-control">
+
+                <span>Minimum Score</span>
+
+                <select id="score-filter">
+
+                    <option value="0">
+                        Any Score
+                    </option>
+
+                    <option value="15">
+                        15+
+                    </option>
+
+                    <option value="18">
+                        18+
+                    </option>
+
+                    <option value="20">
+                        20+
+                    </option>
+
+                    <option value="22">
+                        22+
+                    </option>
+
+                    <option value="24">
+                        24+
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label class="checkbox-control">
+
+                <input
+                    id="favorites-filter"
+                    type="checkbox"
+                >
+
+                <span>
+                    Favorites only
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            id="opportunities-status"
+            class="list-status"
+        >
+            Loading opportunities...
+        </div>
+
+
+        <div
+            id="opportunity-list"
+            class="opportunity-list"
+        ></div>
+
+    </section>
+
+
+    <footer class="page-footer">
+        NZ Student Opportunity OS · Local production dashboard
+    </footer>
+
+</main>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
