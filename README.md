@@ -11,6 +11,48 @@ NZ Student Opportunity OS uses OpenClaw to discover opportunities, validates and
 
 ![NZ Student Opportunity OS Dashboard](docs/dashboard.png)
 
+## Quick Start Demo
+
+A safe demo mode is included so the project can be explored without OpenClaw credentials or production opportunity data.
+
+### Windows
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Eason99123/nz-opportunity-os.git
+cd nz-opportunity-os
+```
+
+Install the development dependency:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run:
+
+```text
+run_demo.bat
+```
+
+The demo will:
+
+1. load safe sample opportunities
+2. run the real refresh and ranking pipeline
+3. generate local runtime status files
+4. run the system health checks
+5. start the local web server
+6. open the dashboard automatically
+
+The dashboard will be available at:
+
+```text
+http://127.0.0.1:8000/web/index.html
+```
+
+Demo mode does not require access to the project's production opportunity data.
+
 ## Overview
 
 Finding internships, student programmes, workshops, hackathons, networking events, and research opportunities often requires manually checking many different websites.
