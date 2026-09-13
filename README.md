@@ -1,5 +1,10 @@
 # NZ Student Opportunity OS
 
+[![CI](https://github.com/Eason99123/nz-opportunity-os/actions/workflows/ci.yml/badge.svg)](https://github.com/Eason99123/nz-opportunity-os/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![Tests](https://img.shields.io/badge/tests-38%20passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 An automated opportunity discovery, validation, lifecycle management, ranking, and monitoring system designed for computer science students in Auckland, New Zealand.
 
 NZ Student Opportunity OS uses OpenClaw to discover opportunities, validates and filters the results, maintains a production opportunity dataset, removes expired entries, ranks current opportunities, and exposes system health through a local web dashboard.
