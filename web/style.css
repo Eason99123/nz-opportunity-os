@@ -804,3 +804,22 @@ select {
         grid-template-columns: 1fr;
     }
 }
+
+.demo-mode-banner {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px solid #f4c36a;
+    border-radius: 10px;
+    background: #fff7df;
+    font-weight: 700;
+    color: #8a5600;
+}
+
+.demo-mode-banner span {
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.demo-mode-banner.hidden {
+    display: none;
+}

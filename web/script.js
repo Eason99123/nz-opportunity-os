@@ -219,6 +219,73 @@ function escapeHtml(value) {
 
 
 /* ============================================================
+   Demo Mode
+============================================================ */
+
+
+function renderDemoMode(
+    weekly
+) {
+
+    const demoMode =
+        weekly?.demo_mode === true;
+
+
+    const demoModeBanner =
+        document.getElementById(
+            "demoModeBanner"
+        );
+
+
+    const dataSourceLabel =
+        document.getElementById(
+            "dataSourceLabel"
+        );
+
+
+    const backendDataBanner =
+        document.getElementById(
+            "backendDataBanner"
+        );
+
+
+    if (demoModeBanner) {
+
+        if (demoMode) {
+
+            demoModeBanner.classList.remove(
+                "hidden"
+            );
+        }
+        else {
+
+            demoModeBanner.classList.add(
+                "hidden"
+            );
+        }
+    }
+
+
+    if (dataSourceLabel) {
+
+        dataSourceLabel.textContent =
+            demoMode
+                ? "Safe demo data"
+                : "Live backend data";
+    }
+
+
+    if (backendDataBanner) {
+
+        backendDataBanner.textContent =
+            demoMode
+                ? "Viewing safe demo data"
+                : "Viewing live backend data";
+    }
+}
+
+
+/* ============================================================
    Favorites
 ============================================================ */
 
@@ -312,6 +379,12 @@ async function loadSystemHealth() {
         fetchJson(PATHS.successful)
     ]);
 
+
+    renderDemoMode(
+        weekly
+    );
+
+
     renderSystemHealth(
         health,
         weekly,
@@ -331,37 +404,43 @@ function renderSystemHealth(
             "system-health-banner"
         );
 
+
     const status =
         String(
             health?.status ||
             "unknown"
         ).toLowerCase();
 
-    banner.textContent =
-        `System Health: ${status.toUpperCase()}`;
 
-    banner.className =
-        "health-banner";
+    if (banner) {
 
-    if (status === "healthy") {
+        banner.textContent =
+            `System Health: ${status.toUpperCase()}`;
 
-        banner.classList.add(
-            "health-healthy"
-        );
-    }
-    else if (
-        status === "warning"
-    ) {
+        banner.className =
+            "health-banner";
 
-        banner.classList.add(
-            "health-warning"
-        );
-    }
-    else {
 
-        banner.classList.add(
-            "health-unhealthy"
-        );
+        if (status === "healthy") {
+
+            banner.classList.add(
+                "health-healthy"
+            );
+        }
+        else if (
+            status === "warning"
+        ) {
+
+            banner.classList.add(
+                "health-warning"
+            );
+        }
+        else {
+
+            banner.classList.add(
+                "health-unhealthy"
+            );
+        }
     }
 
 
@@ -408,17 +487,21 @@ function renderSystemHealth(
             "run-stage-label"
         );
 
-    if (
-        weekly?.status === "failed"
-    ) {
 
-        stageLabel.textContent =
-            "Failure Stage";
-    }
-    else {
+    if (stageLabel) {
 
-        stageLabel.textContent =
-            "Run Stage";
+        if (
+            weekly?.status === "failed"
+        ) {
+
+            stageLabel.textContent =
+                "Failure Stage";
+        }
+        else {
+
+            stageLabel.textContent =
+                "Run Stage";
+        }
     }
 
 
@@ -522,7 +605,14 @@ function renderHealthIssues(issues) {
             "health-issues"
         );
 
+
+    if (!container) {
+        return;
+    }
+
+
     container.innerHTML = "";
+
 
     if (
         !Array.isArray(issues) ||
@@ -538,10 +628,15 @@ function renderHealthIssues(issues) {
         return;
     }
 
+
     container.className = "";
 
+
     const list =
-        document.createElement("ul");
+        document.createElement(
+            "ul"
+        );
+
 
     for (
         const issue
@@ -549,15 +644,22 @@ function renderHealthIssues(issues) {
     ) {
 
         const item =
-            document.createElement("li");
+            document.createElement(
+                "li"
+            );
 
         item.textContent =
             issue;
 
-        list.appendChild(item);
+        list.appendChild(
+            item
+        );
     }
 
-    container.appendChild(list);
+
+    container.appendChild(
+        list
+    );
 }
 
 
@@ -568,7 +670,14 @@ function renderComponentHealth(checks) {
             "component-health-list"
         );
 
+
+    if (!container) {
+        return;
+    }
+
+
     container.innerHTML = "";
+
 
     if (
         !Array.isArray(checks) ||
@@ -580,6 +689,7 @@ function renderComponentHealth(checks) {
 
         return;
     }
+
 
     const labels = {
 
@@ -606,14 +716,18 @@ function renderComponentHealth(checks) {
     ) {
 
         const row =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         row.className =
             "component-health-row";
 
 
         const name =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
 
         name.className =
             "component-health-name";
@@ -625,7 +739,9 @@ function renderComponentHealth(checks) {
 
 
         const status =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
 
         status.className =
             "component-health-status";
@@ -651,11 +767,17 @@ function renderComponentHealth(checks) {
         }
 
 
-        row.appendChild(name);
+        row.appendChild(
+            name
+        );
 
-        row.appendChild(status);
+        row.appendChild(
+            status
+        );
 
-        container.appendChild(row);
+        container.appendChild(
+            row
+        );
     }
 }
 
@@ -674,10 +796,12 @@ async function loadRefreshStatus() {
                 PATHS.refresh
             );
 
+
         text(
             "refresh-status",
             refresh.status
         );
+
 
         text(
             "refresh-started",
@@ -686,6 +810,7 @@ async function loadRefreshStatus() {
             )
         );
 
+
         text(
             "refresh-finished",
             formatDateTime(
@@ -693,10 +818,12 @@ async function loadRefreshStatus() {
             )
         );
 
+
         text(
             "refresh-message",
             refresh.message
         );
+
 
         text(
             "refresh-history-json",
@@ -705,6 +832,7 @@ async function loadRefreshStatus() {
             )
         );
 
+
         text(
             "refresh-changes-json",
             fileNameFromPath(
@@ -712,7 +840,15 @@ async function loadRefreshStatus() {
             )
         );
     }
-    catch {
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Unable to load refresh status:",
+            error
+        );
+
 
         text(
             "refresh-status",
@@ -736,6 +872,7 @@ async function loadBatchStatus() {
                 PATHS.batch
             );
 
+
         text(
             "batch-exists",
             batch.exists
@@ -743,15 +880,18 @@ async function loadBatchStatus() {
                 : "no"
         );
 
+
         const count =
             Number(
                 batch.entry_count || 0
             );
 
+
         text(
             "batch-entries",
             count
         );
+
 
         text(
             "batch-updated",
@@ -760,6 +900,7 @@ async function loadBatchStatus() {
             )
         );
 
+
         text(
             "batch-generated",
             formatDateTime(
@@ -767,27 +908,41 @@ async function loadBatchStatus() {
             )
         );
 
+
         text(
             "batch-file",
             batch.batch_file
         );
+
 
         const badge =
             document.getElementById(
                 "batch-workflow-state"
             );
 
-        badge.textContent =
-            count > 0
-                ? "Batch workflow state: Production Ready"
-                : "Batch workflow state: Empty";
+
+        if (badge) {
+
+            badge.textContent =
+                count > 0
+                    ? "Batch workflow state: Production Ready"
+                    : "Batch workflow state: Empty";
+        }
 
 
         renderBatchTitles(
             batch.titles || []
         );
     }
-    catch {
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Unable to load batch status:",
+            error
+        );
+
 
         text(
             "batch-entries",
@@ -804,7 +959,14 @@ function renderBatchTitles(titles) {
             "batch-title-list"
         );
 
+
+    if (!container) {
+        return;
+    }
+
+
     container.innerHTML = "";
+
 
     if (
         !Array.isArray(titles) ||
@@ -817,8 +979,10 @@ function renderBatchTitles(titles) {
         return;
     }
 
+
     container.className =
         "batch-title-list";
+
 
     for (
         const title
@@ -826,7 +990,9 @@ function renderBatchTitles(titles) {
     ) {
 
         const chip =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
 
         chip.className =
             "batch-title-chip";
@@ -834,7 +1000,9 @@ function renderBatchTitles(titles) {
         chip.textContent =
             title;
 
-        container.appendChild(chip);
+        container.appendChild(
+            chip
+        );
     }
 }
 
@@ -851,12 +1019,14 @@ async function loadOpportunities() {
             "opportunities-status"
         );
 
+
     try {
 
         const data =
             await fetchJson(
                 PATHS.opportunities
             );
+
 
         if (
             Array.isArray(data)
@@ -879,19 +1049,37 @@ async function loadOpportunities() {
             allOpportunities = [];
         }
 
+
         populateTypeFilter();
 
         renderOpportunities();
 
-        status.textContent =
-            `${allOpportunities.length} production opportunities loaded.`;
+
+        if (status) {
+
+            status.textContent =
+                `${allOpportunities.length} production opportunities loaded.`;
+        }
     }
-    catch {
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Unable to load opportunities:",
+            error
+        );
+
 
         allOpportunities = [];
 
-        status.textContent =
-            "Unable to load live opportunity data.";
+
+        if (status) {
+
+            status.textContent =
+                "Unable to load live opportunity data.";
+        }
+
 
         renderOpportunities();
     }
@@ -905,6 +1093,12 @@ function populateTypeFilter() {
             "type-filter"
         );
 
+
+    if (!select) {
+        return;
+    }
+
+
     const types =
         [
             ...new Set(
@@ -913,12 +1107,16 @@ function populateTypeFilter() {
                         item =>
                             item.type
                     )
-                    .filter(Boolean)
+                    .filter(
+                        Boolean
+                    )
             )
         ].sort();
 
+
     select.innerHTML =
         '<option value="">All Types</option>';
+
 
     for (
         const type
@@ -936,46 +1134,61 @@ function populateTypeFilter() {
         option.textContent =
             type;
 
-        select.appendChild(option);
+        select.appendChild(
+            option
+        );
     }
 }
 
 
 function getFilteredOpportunities() {
 
+    const searchInput =
+        document.getElementById(
+            "search-input"
+        );
+
+
+    const typeFilter =
+        document.getElementById(
+            "type-filter"
+        );
+
+
+    const scoreFilter =
+        document.getElementById(
+            "score-filter"
+        );
+
+
+    const favoritesFilter =
+        document.getElementById(
+            "favorites-filter"
+        );
+
+
     const search =
-        document
-            .getElementById(
-                "search-input"
-            )
-            .value
-            .toLowerCase();
+        (
+            searchInput?.value ||
+            ""
+        ).toLowerCase();
 
 
     const type =
-        document
-            .getElementById(
-                "type-filter"
-            )
-            .value;
+        typeFilter?.value ||
+        "";
 
 
     const minimumScore =
         Number(
-            document
-                .getElementById(
-                    "score-filter"
-                )
-                .value
+            scoreFilter?.value ||
+            0
         );
 
 
     const favoritesOnly =
-        document
-            .getElementById(
-                "favorites-filter"
-            )
-            .checked;
+        favoritesFilter?.checked ||
+        false;
 
 
     return allOpportunities.filter(
@@ -989,7 +1202,9 @@ function getFilteredOpportunities() {
                     opportunity.why_fit,
                     opportunity.next_step
                 ]
-                    .filter(Boolean)
+                    .filter(
+                        Boolean
+                    )
                     .join(" ")
                     .toLowerCase();
 
@@ -1007,7 +1222,8 @@ function getFilteredOpportunities() {
                 ) &&
                 (
                     Number(
-                        opportunity.total_score || 0
+                        opportunity.total_score ||
+                        0
                     ) >= minimumScore
                 ) &&
                 (
@@ -1031,8 +1247,15 @@ function renderOpportunities() {
             "opportunity-list"
         );
 
+
+    if (!container) {
+        return;
+    }
+
+
     const opportunities =
         getFilteredOpportunities();
+
 
     text(
         "visible-count",
@@ -1040,7 +1263,9 @@ function renderOpportunities() {
         "0"
     );
 
+
     container.innerHTML = "";
+
 
     if (
         opportunities.length === 0
@@ -1080,6 +1305,7 @@ function createOpportunityCard(
             "article"
         );
 
+
     card.className =
         "opportunity-card";
 
@@ -1118,6 +1344,8 @@ function createOpportunityCard(
                         ? "active"
                         : ""
                 }"
+                type="button"
+                aria-label="Toggle favorite"
             >
                 ${
                     favorite
@@ -1236,11 +1464,15 @@ function createOpportunityCard(
     `;
 
 
-    card
-        .querySelector(
+    const favoriteButton =
+        card.querySelector(
             ".favorite-button"
-        )
-        .addEventListener(
+        );
+
+
+    if (favoriteButton) {
+
+        favoriteButton.addEventListener(
             "click",
             () => {
 
@@ -1249,6 +1481,7 @@ function createOpportunityCard(
                 );
             }
         );
+    }
 
 
     return card;
@@ -1271,7 +1504,8 @@ function scoreChip(
 
     return `
         <span class="score-chip">
-            ${label} ${value}/5
+            ${escapeHtml(label)}
+            ${escapeHtml(value)}/5
         </span>
     `;
 }
@@ -1284,59 +1518,85 @@ function scoreChip(
 
 function attachEventListeners() {
 
-    document
-        .getElementById(
+    const searchInput =
+        document.getElementById(
             "search-input"
-        )
-        .addEventListener(
+        );
+
+
+    const typeFilter =
+        document.getElementById(
+            "type-filter"
+        );
+
+
+    const scoreFilter =
+        document.getElementById(
+            "score-filter"
+        );
+
+
+    const favoritesFilter =
+        document.getElementById(
+            "favorites-filter"
+        );
+
+
+    const refreshHealthButton =
+        document.getElementById(
+            "refresh-health-button"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
             "input",
             renderOpportunities
         );
+    }
 
 
-    document
-        .getElementById(
-            "type-filter"
-        )
-        .addEventListener(
+    if (typeFilter) {
+
+        typeFilter.addEventListener(
             "change",
             renderOpportunities
         );
+    }
 
 
-    document
-        .getElementById(
-            "score-filter"
-        )
-        .addEventListener(
+    if (scoreFilter) {
+
+        scoreFilter.addEventListener(
             "change",
             renderOpportunities
         );
+    }
 
 
-    document
-        .getElementById(
-            "favorites-filter"
-        )
-        .addEventListener(
+    if (favoritesFilter) {
+
+        favoritesFilter.addEventListener(
             "change",
             renderOpportunities
         );
+    }
 
 
-    document
-        .getElementById(
-            "refresh-health-button"
-        )
-        .addEventListener(
+    if (refreshHealthButton) {
+
+        refreshHealthButton.addEventListener(
             "click",
             async event => {
 
                 const button =
                     event.currentTarget;
 
+
                 button.disabled =
                     true;
+
 
                 button.textContent =
                     "Refreshing...";
@@ -1355,11 +1615,13 @@ function attachEventListeners() {
                     button.disabled =
                         false;
 
+
                     button.textContent =
                         "Refresh Health";
                 }
             }
         );
+    }
 }
 
 
@@ -1372,12 +1634,25 @@ async function initializeDashboard() {
 
     attachEventListeners();
 
-    await Promise.all([
-        loadSystemHealth(),
-        loadRefreshStatus(),
-        loadBatchStatus(),
-        loadOpportunities()
-    ]);
+
+    try {
+
+        await Promise.all([
+            loadSystemHealth(),
+            loadRefreshStatus(),
+            loadBatchStatus(),
+            loadOpportunities()
+        ]);
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Dashboard initialization failed:",
+            error
+        );
+    }
 }
 
 

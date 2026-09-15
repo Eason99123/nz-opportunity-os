@@ -36,6 +36,16 @@ SUCCESSFUL_RUN_FILE = (
     / "latest_successful_weekly_run.json"
 )
 
+VALIDATION_STATUS_FILE = (
+    LOG_DIR
+    / "latest_validation_status.json"
+)
+
+LIFECYCLE_STATUS_FILE = (
+    LOG_DIR
+    / "latest_archive_status.json"
+)
+
 OUTPUT_JSON = (
     PROJECT_ROOT
     / "opportunities"
@@ -44,7 +54,11 @@ OUTPUT_JSON = (
 
 
 def timestamp() -> str:
-    return datetime.now().astimezone().isoformat()
+    return (
+        datetime.now()
+        .astimezone()
+        .isoformat()
+    )
 
 
 def load_generated_opportunities() -> list[dict[str, Any]]:
@@ -60,6 +74,7 @@ def load_generated_opportunities() -> list[dict[str, Any]]:
     except (
         json.JSONDecodeError,
         UnicodeDecodeError,
+        OSError,
     ):
         return []
 
@@ -67,8 +82,30 @@ def load_generated_opportunities() -> list[dict[str, Any]]:
         return [
             item
             for item in data
-            if isinstance(item, dict)
+            if isinstance(
+                item,
+                dict,
+            )
         ]
+
+    if isinstance(data, dict):
+        opportunities = data.get(
+            "opportunities",
+            [],
+        )
+
+        if isinstance(
+            opportunities,
+            list,
+        ):
+            return [
+                item
+                for item in opportunities
+                if isinstance(
+                    item,
+                    dict,
+                )
+            ]
 
     return []
 
@@ -76,11 +113,14 @@ def load_generated_opportunities() -> list[dict[str, Any]]:
 def run_python_script(
     relative_path: str,
 ) -> None:
-    script = PROJECT_ROOT / relative_path
+    script = (
+        PROJECT_ROOT
+        / relative_path
+    )
 
     if not script.exists():
         raise FileNotFoundError(
-            f"Required script not found: "
+            "Required script not found: "
             f"{script}"
         )
 
@@ -99,75 +139,22 @@ def run_python_script(
     )
 
 
-def write_weekly_status(
-    entry_count: int,
-    started_at: str,
-    finished_at: str,
-    duration_seconds: float,
+def write_json(
+    path: Path,
+    data: dict[str, Any],
 ) -> None:
-    status = {
-        "status": "success",
-        "message": (
-            "Demo environment generated "
-            "successfully from safe sample data."
-        ),
-        "started_at": started_at,
-        "finished_at": finished_at,
-        "failure_stage": "completed",
-        "rollback_performed": False,
-        "production_modified": True,
-        "demo_mode": True,
-        "duration_seconds": round(
-            duration_seconds,
-            2,
-        ),
-        "validation": {
-            "total_entries": entry_count,
-            "approved": entry_count,
-            "needs_review": 0,
-            "rejected": 0,
-        },
-        "lifecycle": {
-            "total_entries": entry_count,
-            "active": entry_count,
-            "uncertain": 0,
-            "expired": 0,
-        },
-    }
-
-    LOG_DIR.mkdir(
+    path.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    payload = json.dumps(
-        status,
-        indent=2,
-        ensure_ascii=False,
-    )
-
-    WEEKLY_STATUS_FILE.write_text(
-        payload,
+    path.write_text(
+        json.dumps(
+            data,
+            indent=2,
+            ensure_ascii=False,
+        ),
         encoding="utf-8",
-    )
-
-    SUCCESSFUL_RUN_FILE.write_text(
-        payload,
-        encoding="utf-8",
-    )
-
-    print(
-        "Wrote demo weekly status:"
-    )
-    print(
-        f"  {WEEKLY_STATUS_FILE}"
-    )
-
-    print(
-        "Wrote demo successful-run status:"
-    )
-    print(
-        f"  {SUCCESSFUL_RUN_FILE}"
     )
 
 
@@ -191,8 +178,191 @@ def prepare_demo_batch() -> None:
     print(
         "Created demo production batch:"
     )
+
     print(
         f"  {BATCH_FILE}"
+    )
+
+
+def write_demo_validation_status(
+    entry_count: int,
+    generated_at: str,
+) -> None:
+    status = {
+        "status": "success",
+        "generated_at": generated_at,
+        "demo_mode": True,
+        "total_entries": entry_count,
+        "approved": entry_count,
+        "needs_review": 0,
+        "rejected": 0,
+        "message": (
+            "Demo validation status generated "
+            "from safe sample data."
+        ),
+    }
+
+    write_json(
+        VALIDATION_STATUS_FILE,
+        status,
+    )
+
+    print(
+        "Wrote demo validation status:"
+    )
+
+    print(
+        f"  {VALIDATION_STATUS_FILE}"
+    )
+
+
+def write_demo_lifecycle_status(
+    opportunities: list[dict[str, Any]],
+    generated_at: str,
+) -> None:
+    entry_count = len(
+        opportunities
+    )
+
+    details = []
+
+    for opportunity in opportunities:
+        title = (
+            opportunity.get(
+                "title"
+            )
+            or opportunity.get(
+                "Title"
+            )
+            or "(untitled)"
+        )
+
+        date_deadline = (
+            opportunity.get(
+                "date_deadline"
+            )
+            or opportunity.get(
+                "Date/Deadline"
+            )
+            or ""
+        )
+
+        details.append(
+            {
+                "title": title,
+                "status": "active",
+                "reason": (
+                    "Safe demo opportunity "
+                    "treated as active."
+                ),
+                "date_deadline": (
+                    date_deadline
+                ),
+            }
+        )
+
+    status = {
+        "status": "success",
+        "generated_at": generated_at,
+        "demo_mode": True,
+        "today": (
+            datetime.now()
+            .date()
+            .isoformat()
+        ),
+        "batch_file": str(
+            BATCH_FILE
+        ),
+        "total_entries": entry_count,
+        "active": entry_count,
+        "uncertain": 0,
+        "expired": 0,
+        "active_file": None,
+        "uncertain_file": None,
+        "archive_file": None,
+        "details": details,
+        "message": (
+            "Demo lifecycle status generated "
+            "from safe sample data."
+        ),
+    }
+
+    write_json(
+        LIFECYCLE_STATUS_FILE,
+        status,
+    )
+
+    print(
+        "Wrote demo lifecycle status:"
+    )
+
+    print(
+        f"  {LIFECYCLE_STATUS_FILE}"
+    )
+
+
+def write_weekly_status(
+    entry_count: int,
+    started_at: str,
+    finished_at: str,
+    duration_seconds: float,
+) -> None:
+    status = {
+        "status": "success",
+        "message": (
+            "Demo environment generated "
+            "successfully from safe sample data."
+        ),
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "duration_seconds": round(
+            duration_seconds,
+            2,
+        ),
+        "failure_stage": "completed",
+        "rollback_performed": False,
+        "production_modified": True,
+        "demo_mode": True,
+        "transaction_backup_file": None,
+        "lifecycle_backup_file": None,
+        "validation": {
+            "total_entries": entry_count,
+            "approved": entry_count,
+            "needs_review": 0,
+            "rejected": 0,
+        },
+        "lifecycle": {
+            "total_entries": entry_count,
+            "active": entry_count,
+            "uncertain": 0,
+            "expired": 0,
+        },
+    }
+
+    write_json(
+        WEEKLY_STATUS_FILE,
+        status,
+    )
+
+    write_json(
+        SUCCESSFUL_RUN_FILE,
+        status,
+    )
+
+    print(
+        "Wrote demo weekly status:"
+    )
+
+    print(
+        f"  {WEEKLY_STATUS_FILE}"
+    )
+
+    print(
+        "Wrote demo successful-run status:"
+    )
+
+    print(
+        f"  {SUCCESSFUL_RUN_FILE}"
     )
 
 
@@ -201,9 +371,13 @@ def main() -> int:
         "NZ Student Opportunity OS "
         "Demo Setup"
     )
+
     print("=" * 50)
 
-    started_perf = time.perf_counter()
+    started_perf = (
+        time.perf_counter()
+    )
+
     started_at = timestamp()
 
     try:
@@ -213,17 +387,35 @@ def main() -> int:
             "src/refresh_from_batch.py"
         )
 
+        run_python_script(
+            "src/write_batch_status.py"
+        )
+
         opportunities = (
             load_generated_opportunities()
         )
 
-        entry_count = len(opportunities)
+        entry_count = len(
+            opportunities
+        )
 
         if entry_count == 0:
             raise RuntimeError(
                 "Demo pipeline produced "
                 "zero opportunities."
             )
+
+        generated_at = timestamp()
+
+        write_demo_validation_status(
+            entry_count=entry_count,
+            generated_at=generated_at,
+        )
+
+        write_demo_lifecycle_status(
+            opportunities=opportunities,
+            generated_at=generated_at,
+        )
 
         finished_at = timestamp()
 
@@ -245,17 +437,38 @@ def main() -> int:
 
         print()
         print("=" * 50)
+
         print(
             "Demo setup completed successfully."
         )
+
         print(
             f"Demo opportunities: "
             f"{entry_count}"
         )
+
         print()
+
+        print(
+            "Expected demo health state:"
+        )
+
+        print(
+            f"  Production entries: "
+            f"{entry_count}"
+        )
+
+        print(
+            f"  Lifecycle active: "
+            f"{entry_count}"
+        )
+
+        print()
+
         print(
             "Start the local server and open:"
         )
+
         print(
             "http://127.0.0.1:8000/"
             "web/index.html"
@@ -265,24 +478,31 @@ def main() -> int:
 
     except subprocess.CalledProcessError as exc:
         print()
+
         print(
             "Demo setup failed while running "
             "a pipeline component."
         )
+
         print(
-            f"Exit code: {exc.returncode}"
+            f"Exit code: "
+            f"{exc.returncode}"
         )
 
         return 1
 
     except Exception as exc:
         print()
+
         print(
-            f"Demo setup failed: {exc}"
+            f"Demo setup failed: "
+            f"{exc}"
         )
 
         return 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(
+        main()
+    )
