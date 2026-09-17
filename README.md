@@ -4,10 +4,19 @@
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Release](https://img.shields.io/github/v/release/Eason99123/nz-opportunity-os)
 
 A local automation pipeline for discovering, validating, ranking, monitoring, and managing student opportunities for computer science students in Auckland, New Zealand.
 
 ![NZ Student Opportunity OS Dashboard](docs/dashboard.png)
+
+## Latest Stable Release
+
+```text
+v1.0.0
+```
+
+This is the first stable, publicly demonstrable, and portfolio-ready release of NZ Student Opportunity OS.
 
 ## In 30 Seconds
 
@@ -15,16 +24,16 @@ NZ Student Opportunity OS is a local automation and monitoring system for findin
 
 It combines:
 
-- AI-assisted opportunity discovery
-- deterministic Python processing
-- validation and duplicate detection
-- lifecycle management
-- weighted ranking
-- transaction-style rollback
-- automated health monitoring
-- continuous testing
-- a local web dashboard
-- a safe standalone demo mode
+* AI-assisted opportunity discovery
+* deterministic Python processing
+* validation and duplicate detection
+* lifecycle management
+* weighted ranking
+* transaction-style rollback
+* automated health monitoring
+* continuous testing
+* a local web dashboard
+* a safe standalone demo mode
 
 The system can run with OpenClaw for automated discovery, while the core Python pipeline can also be tested and demonstrated independently.
 
@@ -54,16 +63,17 @@ The system combines AI-assisted discovery with a deterministic Python pipeline t
 
 The project currently includes:
 
-- 45 automated tests
-- GitHub Actions CI
-- automated release safety checks
-- production and demo modes
-- transaction-style rollback
-- lifecycle management
-- validation and duplicate detection
-- automated system health monitoring
-- a local web dashboard
-- safe sample data for public demonstration
+* 45 automated tests
+* GitHub Actions CI
+* automated release safety checks
+* production and demo modes
+* transaction-style rollback
+* lifecycle management
+* validation and duplicate detection
+* automated system health monitoring
+* a local web dashboard
+* safe sample data for public demonstration
+* a stable v1.0.0 release
 
 The public repository excludes private runtime data and local production files.
 
@@ -91,6 +101,7 @@ The project therefore includes both opportunity-processing logic and operational
 Current public project status:
 
 ```text
+Stable release               v1.0.0
 Automated tests              45 passing
 GitHub Actions               enabled
 Release preflight            enabled
@@ -163,39 +174,39 @@ OpenClaw can be used to discover opportunities, but validation, lifecycle classi
 
 This separation makes the system easier to:
 
-- test
-- debug
-- demonstrate
-- maintain
-- extend
+* test
+* debug
+* demonstrate
+* maintain
+* extend
 
 ### Validation Pipeline
 
 New opportunities are classified into:
 
-- Approved
-- Needs Review
-- Rejected
+* Approved
+* Needs Review
+* Rejected
 
 Only approved opportunities are allowed to enter the production batch.
 
 Validation logic also handles cases such as:
 
-- weak source links
-- generic search pages
-- duplicate opportunities
-- near duplicates
-- suspicious or incomplete entries
-- semantically distinct sessions
-- different events with similar names
+* weak source links
+* generic search pages
+* duplicate opportunities
+* near duplicates
+* suspicious or incomplete entries
+* semantically distinct sessions
+* different events with similar names
 
 ### Lifecycle Management
 
 Existing opportunities are classified as:
 
-- Active
-- Uncertain
-- Expired
+* Active
+* Uncertain
+* Expired
 
 The lifecycle system attempts to identify machine-verifiable dates and distinguish current opportunities from expired ones.
 
@@ -213,11 +224,11 @@ This protects the system from partial or inconsistent updates.
 
 The system monitors:
 
-- weekly automation
-- validation
-- lifecycle processing
-- refresh pipeline
-- production batch
+* weekly automation
+* validation
+* lifecycle processing
+* refresh pipeline
+* production batch
 
 It also performs cross-checks between different components.
 
@@ -229,11 +240,11 @@ The repository includes a standalone demo environment.
 
 Demo mode:
 
-- uses safe sample opportunities
-- generates its own runtime status
-- does not depend on private production data
-- does not require OpenClaw credentials
-- still exercises the real core processing pipeline
+* uses safe sample opportunities
+* generates its own runtime status
+* does not depend on private production data
+* does not require OpenClaw credentials
+* still exercises the real core processing pipeline
 
 The dashboard clearly labels demo mode so sample data cannot be confused with production data.
 
@@ -243,14 +254,14 @@ The dashboard clearly labels demo mode so sample data cannot be confused with pr
 
 Each opportunity can receive scores across five categories.
 
-| Category | Maximum |
-| --- | ---: |
-| Relevance | 5 |
-| Beginner Fit | 5 |
-| Career Value | 5 |
-| Practicality | 5 |
-| University Fit | 5 |
-| Total | 25 |
+| Category       | Maximum |
+| -------------- | ------: |
+| Relevance      |       5 |
+| Beginner Fit   |       5 |
+| Career Value   |       5 |
+| Practicality   |       5 |
+| University Fit |       5 |
+| Total          |      25 |
 
 The final score is used to rank opportunities.
 
@@ -272,11 +283,11 @@ Rejected
 
 Examples of entries that may require review or rejection include:
 
-- generic search result pages
-- duplicate listings
-- expired opportunities
-- incomplete opportunities
-- weak or unverifiable source links
+* generic search result pages
+* duplicate listings
+* expired opportunities
+* incomplete opportunities
+* weak or unverifiable source links
 
 The validation layer reduces the amount of unreliable AI-discovered information entering the production dataset.
 
@@ -292,8 +303,8 @@ For example, different sessions of the same programme can remain separate when t
 
 This reduces both:
 
-- duplicate noise
-- false-positive duplicate removal
+* duplicate noise
+* false-positive duplicate removal
 
 ---
 
@@ -347,12 +358,12 @@ The weekly automation includes safety mechanisms designed to reduce the risk of 
 
 Features include:
 
-- pre-update transaction backups
-- lifecycle backups
-- failure stage tracking
-- rollback status tracking
-- production modification tracking
-- failure injection testing
+* pre-update transaction backups
+* lifecycle backups
+* failure stage tracking
+* rollback status tracking
+* production modification tracking
+* failure injection testing
 
 The project has been tested with deliberate automation failure scenarios to verify rollback behavior.
 
@@ -400,24 +411,24 @@ The local web dashboard provides a visual view of the system.
 
 It displays:
 
-- system health
-- last weekly automation run
-- last successful run
-- run duration
-- production entry count
-- run stage
-- rollback status
-- validation results
-- lifecycle results
-- component health
-- health issues
-- opportunity cards
-- scores
-- source links
-- filters
-- favorites
-- batch information
-- refresh information
+* system health
+* last weekly automation run
+* last successful run
+* run duration
+* production entry count
+* run stage
+* rollback status
+* validation results
+* lifecycle results
+* component health
+* health issues
+* opportunity cards
+* scores
+* source links
+* filters
+* favorites
+* batch information
+* refresh information
 
 The dashboard also distinguishes between:
 
@@ -599,16 +610,16 @@ Current expected result:
 
 The tests cover:
 
-- parsing
-- exporting
-- ranking
-- validation
-- lifecycle classification
-- migration
-- system health
-- CLI behavior
-- demo safety
-- demo UI integration
+* parsing
+* exporting
+* ranking
+* validation
+* lifecycle classification
+* migration
+* system health
+* CLI behavior
+* demo safety
+* demo UI integration
 
 ---
 
@@ -645,17 +656,39 @@ python src/release_preflight.py
 
 The release preflight checks public project files for potential issues such as:
 
-- hard-coded Windows user paths
-- API key patterns
-- bearer tokens
-- secret assignments
-- sensitive credential files
+* hard-coded Windows user paths
+* API key patterns
+* bearer tokens
+* secret assignments
+* sensitive credential files
 
 A successful check reports:
 
 ```text
 Release preflight PASSED.
 ```
+
+---
+
+## Release
+
+The first stable release is:
+
+```text
+v1.0.0
+```
+
+Release status:
+
+```text
+Stable
+45 tests passing
+Release preflight passed
+GitHub Actions passing
+Standalone demo available
+```
+
+The release represents the first publicly demonstrable and portfolio-ready version of the project.
 
 ---
 
@@ -794,8 +827,6 @@ Many generated runtime files are excluded from Git.
 
 ## Engineering Goals
 
-This project focuses on several engineering goals.
-
 ### Reliability
 
 AI-assisted discovery is followed by deterministic processing and validation.
@@ -849,7 +880,7 @@ Git
 GitHub
 GitHub Actions
 Pytest
-CI
+continuous integration
 release safety
 ```
 
@@ -865,8 +896,8 @@ Implemented automated testing with Pytest, GitHub Actions CI, release safety che
 
 ### CV Bullet Version
 
-- Built a Python automation pipeline for discovering, validating, ranking, and lifecycle-managing student opportunities, with rollback-safe updates and automated health monitoring.
-- Added 45 automated tests, GitHub Actions CI, release safety checks, and a standalone demo dashboard using safe public sample data.
+* Built a Python automation pipeline for discovering, validating, ranking, and lifecycle-managing student opportunities, with rollback-safe updates and automated health monitoring.
+* Added 45 automated tests, GitHub Actions CI, release safety checks, and a standalone demo dashboard using safe public sample data.
 
 ---
 
@@ -882,12 +913,12 @@ The main challenge was making an AI-assisted discovery workflow reliable enough 
 
 Raw discovered opportunities could contain:
 
-- duplicates
-- weak sources
-- expired events
-- incomplete dates
-- generic search pages
-- low-quality entries
+* duplicates
+* weak sources
+* expired events
+* incomplete dates
+* generic search pages
+* low-quality entries
 
 I addressed this by placing deterministic validation, lifecycle, ranking, and health-checking stages after discovery.
 
@@ -917,16 +948,16 @@ This helped identify stale lifecycle runtime data in the demo workflow.
 
 The project currently has 45 automated tests covering:
 
-- parsing
-- ranking
-- exporting
-- validation
-- lifecycle classification
-- migration
-- health monitoring
-- CLI behavior
-- demo safety
-- demo UI integration
+* parsing
+* ranking
+* exporting
+* validation
+* lifecycle classification
+* migration
+* health monitoring
+* CLI behavior
+* demo safety
+* demo UI integration
 
 Tests run both locally and automatically through GitHub Actions.
 
@@ -944,16 +975,16 @@ This allows the project to be demonstrated without exposing production data.
 
 Possible future improvements include:
 
-- additional discovery providers
-- improved semantic duplicate detection
-- richer opportunity filtering
-- configurable scoring weights
-- database-backed storage
-- scheduled notification delivery
-- improved frontend visualization
-- stronger end-to-end integration tests
-- cross-platform automation scripts
-- deployment of a read-only hosted demo
+* additional discovery providers
+* improved semantic duplicate detection
+* richer opportunity filtering
+* configurable scoring weights
+* database-backed storage
+* scheduled notification delivery
+* improved frontend visualization
+* stronger end-to-end integration tests
+* cross-platform automation scripts
+* deployment of a read-only hosted demo
 
 ---
 
