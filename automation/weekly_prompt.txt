@@ -1,4 +1,4 @@
-Use web_search to discover current opportunities, then use web_fetch to verify the official source pages.
+Use web_search to discover current opportunities, then use web_fetch to verify important source pages.
 
 Find current Auckland and New Zealand opportunities suitable for a University of Auckland undergraduate Computer Science student.
 
@@ -8,27 +8,83 @@ Search for:
 3. Hackathons, workshops, coding competitions, and technical meetups
 4. Undergraduate internships, scholarships, summer research, student programmes, and volunteering
 5. Beginner-friendly networking and career opportunities
+6. Software engineering, test automation, QA, Python, developer, and technology internships
 
 Search recent and official sources where possible.
 
+SOURCE PRIORITY
+
+Prefer sources in this order:
+
+1. Official employer career or application pages
+2. Recognised applicant tracking systems linked to an employer, including:
+   Workday
+   Greenhouse
+   Lever
+   SmartRecruiters
+   Ashby
+3. Official university, event organiser, programme, or organisation pages
+4. Third-party job boards such as LinkedIn, SEEK, Indeed, Prosple, GradNewZealand, or similar sources
+
+For internships and jobs:
+
+- Try to identify the employer.
+- Search for an official employer career page or recognised ATS application page.
+- If an official application page is found and accessible, use that page as Source Link.
+- Do not prefer a LinkedIn, SEEK, Indeed, or other third-party listing when a working official application page is available.
+- If only a third-party listing can be found, it may still be returned, but do not claim that the official application is open.
+- Do not invent an official application URL.
+- Do not invent an employer name.
+
+APPLICATION AVAILABILITY
+
+For internships, jobs, scholarships, research programmes, and other opportunities requiring an application:
+
+Before returning the opportunity, check for evidence that it is still actionable.
+
+Look for:
+- an accessible application page
+- an Apply or application action
+- a future or current deadline
+- current programme dates
+- wording showing applications or registrations are open
+
+Look for closure signals such as:
+- no longer accepting applications
+- applications closed
+- position filled
+- job no longer available
+- requisition unavailable
+- page not found
+- expired
+- removed listing
+- past deadline
+
+Do not describe an opportunity as open when the available evidence shows that it is closed, expired, removed, or unavailable.
+
+If availability cannot be confidently confirmed, the opportunity may still be returned when it is otherwise strong, but describe the uncertainty accurately in Next Step.
+
 Requirements:
 1. Return up to 8 strong opportunities.
-2. Include only opportunities that are open, upcoming, or still actionable on the current date.
+2. Prefer opportunities that are open, upcoming, or still actionable on the current date.
 3. Prefer Auckland-based or online opportunities accessible from Auckland.
 4. Exclude expired opportunities.
 5. Exclude events aimed mainly at children, senior executives, HR professionals, or experienced specialists.
-6. Verify dates, eligibility, location, and source links before including an opportunity.
+6. Verify dates, eligibility, location, employer or organiser, and source links before including an opportunity.
 7. Do not invent information.
 8. Every opportunity must include a direct source link.
-9. Separate opportunities using exactly:
-===OPPORTUNITY===
-10. Do not include an introduction, conclusion, markdown table, code fence, reasoning, or commentary.
-11. If no strong opportunities are found, output exactly:
+9. For jobs and internships, include Company when the employer can be verified.
+10. Prefer direct official application links for jobs and internships.
+11. Separate opportunities using exactly:
+---OPPORTUNITY---
+12. Do not include an introduction, conclusion, markdown table, code fence, reasoning, or commentary.
+13. If no strong opportunities are found, output exactly:
 NO_STRONG_MATCHES
 
 Use exactly this format:
 
 Title: ...
+Company: ...
 Type: ...
 Where: ...
 Date/Deadline: ...

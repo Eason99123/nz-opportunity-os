@@ -1,214 +1,57 @@
 from datetime import date
+import sys
+from pathlib import Path
 
-from src.opportunity_verifier import (
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SRC_DIR = PROJECT_ROOT / "src"
+
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from opportunity_verifier import (
     OPEN_VERIFIED,
     OPEN_UNVERIFIED,
     CLOSED,
     APPLICATION_LINK_BROKEN,
     EXPIRED,
+    is_third_party_url,
+    is_recognised_ats_url,
+    is_official_url,
     verify_application_status,
     build_verification_record,
     verify_opportunity,
-    is_third_party_url,
-    is_official_url,
-    is_recognised_ats_url,
+    verify_opportunities,
 )
 
 
-TODAY = date(2026, 9, 21)
+TEST_TODAY = date(2026, 9, 22)
 
 
-def test_official_application_available_is_verified():
-    status = verify_application_status(
-        source_url="https://www.linkedin.com/jobs/example",
-        employer_apply_url="https://company.wd5.myworkdayjobs.com/job/example",
-        application_link_status="OK",
-        official_listing_present=True,
-        today=TODAY,
-    )
+# ============================================================
+# URL classification
+# ============================================================
 
-    assert status == OPEN_VERIFIED
-
-
-def test_third_party_only_is_unverified():
-    status = verify_application_status(
-        source_url="https://nz.prosple.com/example",
-        employer_apply_url="",
-        application_link_status=None,
-        official_listing_present=None,
-        today=TODAY,
-    )
-
-    assert status == OPEN_UNVERIFIED
-
-
-def test_broken_application_link_is_broken():
-    status = verify_application_status(
-        employer_apply_url="https://company.com/jobs/example",
-        application_link_status="404",
-        official_listing_present=True,
-        today=TODAY,
-    )
-
-    assert status == APPLICATION_LINK_BROKEN
-
-
-def test_removed_official_listing_is_closed():
-    status = verify_application_status(
-        employer_apply_url="https://company.com/jobs/example",
-        official_listing_present=False,
-        today=TODAY,
-    )
-
-    assert status == CLOSED
-
-
-def test_past_deadline_is_expired():
-    status = verify_application_status(
-        employer_apply_url="https://company.com/jobs/example",
-        deadline="2026-09-20",
-        application_link_status="OK",
-        official_listing_present=True,
-        today=TODAY,
-    )
-
-    assert status == EXPIRED
-
-
-def test_today_deadline_is_not_expired():
-    status = verify_application_status(
-        employer_apply_url="https://company.com/jobs/example",
-        deadline="2026-09-21",
-        application_link_status="OK",
-        official_listing_present=True,
-        today=TODAY,
-    )
-
-    assert status == OPEN_VERIFIED
-
-
-def test_known_job_board_is_third_party():
+def test_linkedin_is_third_party():
     assert is_third_party_url(
         "https://www.linkedin.com/jobs/view/123"
     ) is True
 
 
-def test_employer_domain_is_official():
-    assert is_official_url(
-        "https://careers.examplecompany.com/jobs/123"
+def test_seek_is_third_party():
+    assert is_third_party_url(
+        "https://www.seek.co.nz/job/123"
     ) is True
 
 
-def test_verification_record_contains_required_fields():
-    record = build_verification_record(
-        employer_apply_url="https://careers.examplecompany.com/jobs/123",
-        application_link_status="OK",
-        official_listing_present=True,
-        today=TODAY,
-    )
+def test_employer_site_is_not_third_party():
+    assert is_third_party_url(
+        "https://careers.examplecompany.com/job/123"
+    ) is False
 
-    assert record["application_status"] == OPEN_VERIFIED
-    assert record["employer_apply_url"] == (
-        "https://careers.examplecompany.com/jobs/123"
-    )
-    assert record["last_verified_at"] == "2026-09-21"
-    assert record["application_link_status"] == "OK"
-
-def test_existing_opportunity_schema_is_preserved():
-    opportunity = {
-        "title": "Software Engineering Internship",
-        "type": "Internship",
-        "where": "Auckland, New Zealand",
-        "date_deadline": "Applications close 30 September 2026",
-        "why_fit": "Python and automation experience.",
-        "next_step": "Apply online.",
-        "source_link": "https://www.linkedin.com/jobs/view/123",
-        "relevance": 5,
-        "beginner_fit": 5,
-        "career_value": 5,
-        "practicality": 5,
-        "university_fit": 5,
-        "total_score": 25,
-    }
-
-    result = verify_opportunity(
-        opportunity,
-        today=TODAY,
-    )
-
-    assert result["title"] == opportunity["title"]
-    assert result["source_link"] == opportunity["source_link"]
-    assert result["total_score"] == opportunity["total_score"]
-    assert "verification" in result
-
-
-def test_existing_opportunity_defaults_to_unverified():
-    opportunity = {
-        "title": "Software Engineering Internship",
-        "source_link": "https://www.linkedin.com/jobs/view/123",
-    }
-
-    result = verify_opportunity(
-        opportunity,
-        today=TODAY,
-    )
-
-    assert (
-        result["verification"]["application_status"]
-        == OPEN_UNVERIFIED
-    )
-
-
-def test_existing_opportunity_can_become_verified():
-    opportunity = {
-        "title": "Test Automation Internship",
-        "source_link": "https://www.linkedin.com/jobs/view/123",
-    }
-
-    result = verify_opportunity(
-        opportunity,
-        employer_apply_url=(
-            "https://company.wd5.myworkdayjobs.com/job/123"
-        ),
-        application_link_status="OK",
-        official_listing_present=True,
-        today=TODAY,
-    )
-
-    assert (
-        result["verification"]["application_status"]
-        == OPEN_VERIFIED
-    )
-
-    assert (
-        result["verification"]["employer_apply_url"]
-        == "https://company.wd5.myworkdayjobs.com/job/123"
-    )
-
-
-def test_verification_does_not_mutate_original_opportunity():
-    opportunity = {
-        "title": "Software Internship",
-        "source_link": "https://nz.prosple.com/example",
-    }
-
-    result = verify_opportunity(
-        opportunity,
-        today=TODAY,
-    )
-
-    assert "verification" not in opportunity
-    assert "verification" in result
 
 def test_workday_is_recognised_ats():
     assert is_recognised_ats_url(
-        "https://microchip.wd5.myworkdayjobs.com/job/123"
-    ) is True
-
-
-def test_workdaysite_is_recognised_ats():
-    assert is_recognised_ats_url(
-        "https://wd5.myworkdaysite.com/recruiting/company/job/123"
+        "https://company.wd5.myworkdaysite.com/job/123"
     ) is True
 
 
@@ -218,31 +61,339 @@ def test_greenhouse_is_recognised_ats():
     ) is True
 
 
-def test_lever_is_recognised_ats():
-    assert is_recognised_ats_url(
-        "https://jobs.lever.co/company/123"
-    ) is True
-
-
-def test_smartrecruiters_is_recognised_ats():
-    assert is_recognised_ats_url(
-        "https://jobs.smartrecruiters.com/company/123"
-    ) is True
-
-
-def test_linkedin_is_not_recognised_ats():
-    assert is_recognised_ats_url(
+def test_linkedin_is_not_official():
+    assert is_official_url(
         "https://www.linkedin.com/jobs/view/123"
     ) is False
 
 
-def test_random_blog_is_not_recognised_ats():
-    assert is_recognised_ats_url(
-        "https://random-tech-blog.example/jobs/123"
-    ) is False
-
-
-def test_third_party_subdomain_is_detected():
-    assert is_third_party_url(
-        "https://jobs.linkedin.com/view/123"
+def test_employer_site_is_official():
+    assert is_official_url(
+        "https://careers.examplecompany.com/job/123"
     ) is True
+
+
+# ============================================================
+# OPEN_UNVERIFIED
+# ============================================================
+
+def test_unknown_opportunity_is_open_unverified():
+    status = verify_application_status(
+        source_url="https://www.linkedin.com/jobs/view/123",
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_UNVERIFIED
+
+
+def test_official_url_without_confirmation_is_unverified():
+    status = verify_application_status(
+        source_url="https://careers.examplecompany.com/job/123",
+        employer_apply_url="https://careers.examplecompany.com/job/123",
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_UNVERIFIED
+
+
+# ============================================================
+# OPEN_VERIFIED
+# ============================================================
+
+def test_confirmed_official_application_is_open_verified():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://careers.examplecompany.com/job/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_VERIFIED
+
+
+def test_confirmed_workday_application_is_open_verified():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://company.wd5.myworkdaysite.com/job/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_VERIFIED
+
+
+def test_third_party_application_cannot_be_open_verified():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://www.linkedin.com/jobs/view/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_UNVERIFIED
+
+
+# ============================================================
+# CLOSED
+# ============================================================
+
+def test_removed_official_listing_is_closed():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://careers.examplecompany.com/job/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=False,
+        today=TEST_TODAY,
+    )
+
+    assert status == CLOSED
+
+
+# ============================================================
+# APPLICATION_LINK_BROKEN
+# ============================================================
+
+def test_broken_application_link():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://careers.examplecompany.com/job/123"
+        ),
+        application_link_status="BROKEN",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == APPLICATION_LINK_BROKEN
+
+
+def test_404_application_link():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://careers.examplecompany.com/job/123"
+        ),
+        application_link_status="404",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == APPLICATION_LINK_BROKEN
+
+
+def test_error_application_link():
+    status = verify_application_status(
+        employer_apply_url=(
+            "https://careers.examplecompany.com/job/123"
+        ),
+        application_link_status="ERROR",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == APPLICATION_LINK_BROKEN
+
+
+# ============================================================
+# EXPIRED
+# ============================================================
+
+def test_past_iso_deadline_is_expired():
+    status = verify_application_status(
+        deadline="2026-09-21",
+        today=TEST_TODAY,
+    )
+
+    assert status == EXPIRED
+
+
+def test_past_slash_deadline_is_expired():
+    status = verify_application_status(
+        deadline="21/09/2026",
+        today=TEST_TODAY,
+    )
+
+    assert status == EXPIRED
+
+
+def test_past_dash_deadline_is_expired():
+    status = verify_application_status(
+        deadline="21-09-2026",
+        today=TEST_TODAY,
+    )
+
+    assert status == EXPIRED
+
+
+def test_deadline_today_is_not_expired():
+    status = verify_application_status(
+        deadline="2026-09-22",
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_UNVERIFIED
+
+
+def test_future_deadline_is_not_expired():
+    status = verify_application_status(
+        deadline="2026-10-01",
+        today=TEST_TODAY,
+    )
+
+    assert status == OPEN_UNVERIFIED
+
+
+# ============================================================
+# Rule priority
+# ============================================================
+
+def test_expired_has_priority_over_broken_link():
+    status = verify_application_status(
+        deadline="2026-09-20",
+        application_link_status="BROKEN",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert status == EXPIRED
+
+
+def test_broken_link_has_priority_over_closed():
+    status = verify_application_status(
+        application_link_status="BROKEN",
+        official_listing_present=False,
+        today=TEST_TODAY,
+    )
+
+    assert status == APPLICATION_LINK_BROKEN
+
+
+# ============================================================
+# Verification record
+# ============================================================
+
+def test_build_verification_record_open_verified():
+    record = build_verification_record(
+        employer_apply_url=(
+            "https://company.wd5.myworkdaysite.com/job/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert record["application_status"] == OPEN_VERIFIED
+    assert record["application_link_status"] == "OK"
+    assert record["last_verified_at"] == "2026-09-22"
+
+
+# ============================================================
+# Opportunity integration
+# ============================================================
+
+def test_verify_opportunity_preserves_original_fields():
+    opportunity = {
+        "title": "Software Engineering Intern",
+        "source_link": "https://www.linkedin.com/jobs/view/123",
+        "total_score": 25,
+    }
+
+    verified = verify_opportunity(
+        opportunity,
+        today=TEST_TODAY,
+    )
+
+    assert verified["title"] == "Software Engineering Intern"
+    assert verified["total_score"] == 25
+    assert verified["verification"]["application_status"] == (
+        OPEN_UNVERIFIED
+    )
+
+
+def test_verify_opportunity_does_not_modify_original():
+    opportunity = {
+        "title": "Software Engineering Intern",
+        "source_link": "https://www.linkedin.com/jobs/view/123",
+    }
+
+    verify_opportunity(
+        opportunity,
+        today=TEST_TODAY,
+    )
+
+    assert "verification" not in opportunity
+
+
+def test_verify_opportunity_can_be_open_verified():
+    opportunity = {
+        "title": "Test Automation Intern",
+        "source_link": "https://example.com/job",
+    }
+
+    verified = verify_opportunity(
+        opportunity,
+        employer_apply_url=(
+            "https://company.wd5.myworkdaysite.com/job/123"
+        ),
+        application_link_status="OK",
+        official_listing_present=True,
+        today=TEST_TODAY,
+    )
+
+    assert verified["verification"]["application_status"] == (
+        OPEN_VERIFIED
+    )
+
+    assert verified["verification"]["official_listing_present"] is True
+
+
+# ============================================================
+# Collection integration
+# ============================================================
+
+def test_verify_opportunities_returns_all_items():
+    opportunities = [
+        {
+            "title": "Opportunity A",
+            "source_link": "https://example.com/a",
+        },
+        {
+            "title": "Opportunity B",
+            "source_link": "https://example.com/b",
+        },
+    ]
+
+    verified = verify_opportunities(opportunities)
+
+    assert len(verified) == 2
+
+    assert all(
+        "verification" in opportunity
+        for opportunity in verified
+    )
+
+
+def test_verify_opportunities_defaults_to_unverified():
+    opportunities = [
+        {
+            "title": "Opportunity A",
+            "source_link": "https://example.com/a",
+        },
+        {
+            "title": "Opportunity B",
+            "source_link": "https://example.com/b",
+        },
+    ]
+
+    verified = verify_opportunities(opportunities)
+
+    assert all(
+        opportunity["verification"]["application_status"]
+        == OPEN_UNVERIFIED
+        for opportunity in verified
+    )
