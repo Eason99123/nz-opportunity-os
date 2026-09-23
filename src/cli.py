@@ -3,15 +3,21 @@ import sys
 from datetime import datetime, UTC
 from pathlib import Path
 
+from actionable_queue import (
+    build_actionable_queue,
+    build_queue_summary,
+)
 from exporter import save_markdown_summary, save_to_csv, save_to_json
+from opportunity_verifier import verify_opportunities
 from parser import parse_opportunities
 from ranking import (
     deduplicate_opportunities,
     generate_next_actions,
-    get_best_opportunity,
+    generate_verification_actions,
+    get_best_actionable_opportunity,
+    get_top_unverified_opportunity,
     sort_opportunities,
 )
-from opportunity_verifier import verify_opportunities
 
 
 USAGE = """
@@ -36,11 +42,15 @@ def read_input_text(input_path: Path) -> str:
 
 def get_paths_from_args() -> tuple[Path, Path, Path]:
     default_input = Path("input") / "opportunities.txt"
+
     default_json_output = (
-        Path("opportunities") / "deduplicated_ranked_output.json"
+        Path("opportunities")
+        / "deduplicated_ranked_output.json"
     )
+
     default_md_output = (
-        Path("opportunities") / "weekly_summary.md"
+        Path("opportunities")
+        / "weekly_summary.md"
     )
 
     args = sys.argv[1:]
@@ -72,7 +82,11 @@ def get_paths_from_args() -> tuple[Path, Path, Path]:
         else default_md_output
     )
 
-    return input_file, json_output_file, md_output_file
+    return (
+        input_file,
+        json_output_file,
+        md_output_file,
+    )
 
 
 def build_history_paths(
@@ -82,21 +96,44 @@ def build_history_paths(
 
     history_dir = base_dir / "history"
 
-    json_path = history_dir / f"{timestamp_label}.json"
-    csv_path = history_dir / f"{timestamp_label}.csv"
-    md_path = history_dir / f"{timestamp_label}.md"
+    json_path = (
+        history_dir
+        / f"{timestamp_label}.json"
+    )
 
-    return json_path, csv_path, md_path
+    csv_path = (
+        history_dir
+        / f"{timestamp_label}.csv"
+    )
+
+    md_path = (
+        history_dir
+        / f"{timestamp_label}.md"
+    )
+
+    return (
+        json_path,
+        csv_path,
+        md_path,
+    )
 
 
 def main() -> None:
     try:
-        input_file, json_output_file, md_output_file = (
-            get_paths_from_args()
-        )
+        (
+            input_file,
+            json_output_file,
+            md_output_file,
+        ) = get_paths_from_args()
 
         csv_output_file = (
-            Path("opportunities") / "opportunities.csv"
+            Path("opportunities")
+            / "opportunities.csv"
+        )
+
+        actionable_queue_output = (
+            Path("opportunities")
+            / "actionable_queue.json"
         )
 
         text = read_input_text(input_file)
@@ -109,57 +146,120 @@ def main() -> None:
         # ---------------------------------------------------------
         # 2. Remove duplicate opportunities
         # ---------------------------------------------------------
-        deduplicated = deduplicate_opportunities(parsed)
+        deduplicated = (
+            deduplicate_opportunities(parsed)
+        )
 
         # ---------------------------------------------------------
         # 3. Verify application/source status
-        #
-        # This enriches each opportunity with verification fields
-        # such as:
-        #
-        # application_status
-        # application_link_status
-        # source_type
-        # last_verified_at
-        # verification_reason
-        #
-        # verify_opportunities() must not mutate the original list.
         # ---------------------------------------------------------
-        verified = verify_opportunities(deduplicated)
+        verified = verify_opportunities(
+            deduplicated
+        )
 
         # ---------------------------------------------------------
         # 4. Rank verified opportunities
         # ---------------------------------------------------------
-        ranked = sort_opportunities(verified)
-
-        # ---------------------------------------------------------
-        # 5. Select best opportunity and generate actions
-        # ---------------------------------------------------------
-        best = get_best_opportunity(ranked)
-        actions = generate_next_actions(best)
-
-        # ---------------------------------------------------------
-        # 6. Build timestamp
-        # ---------------------------------------------------------
-        generated_at = datetime.now(UTC)
-        generated_at_iso = generated_at.isoformat()
-        timestamp_label = generated_at.strftime(
-            "%Y-%m-%d_%H%M%S"
+        ranked = sort_opportunities(
+            verified
         )
 
         # ---------------------------------------------------------
-        # 7. Build main JSON payload
+        # 5. Build actionable opportunity queue
+        #
+        # Only OPEN_VERIFIED opportunities are allowed through
+        # this gate.
+        # ---------------------------------------------------------
+        actionable_queue = (
+            build_actionable_queue(ranked)
+        )
+
+        queue_summary = (
+            build_queue_summary(ranked)
+        )
+
+        # ---------------------------------------------------------
+        # 6. Select verification-aware opportunities
+        #
+        # Best Actionable:
+        #     Highest-ranked OPEN_VERIFIED opportunity.
+        #
+        # Top Unverified:
+        #     Highest-ranked OPEN_UNVERIFIED opportunity that
+        #     should be manually verified before action.
+        # ---------------------------------------------------------
+        best_actionable = (
+            get_best_actionable_opportunity(
+                ranked
+            )
+        )
+
+        top_unverified = (
+            get_top_unverified_opportunity(
+                ranked
+            )
+        )
+
+        # ---------------------------------------------------------
+        # 7. Generate safe next actions
+        #
+        # Verified opportunities receive normal next actions.
+        # If nothing is verified, the system generates
+        # verification actions instead.
+        # ---------------------------------------------------------
+        if best_actionable:
+            actions = generate_next_actions(
+                best_actionable
+            )
+        else:
+            actions = (
+                generate_verification_actions(
+                    top_unverified
+                )
+            )
+
+        # ---------------------------------------------------------
+        # 8. Build timestamp
+        # ---------------------------------------------------------
+        generated_at = datetime.now(UTC)
+
+        generated_at_iso = (
+            generated_at.isoformat()
+        )
+
+        timestamp_label = (
+            generated_at.strftime(
+                "%Y-%m-%d_%H%M%S"
+            )
+        )
+
+        # ---------------------------------------------------------
+        # 9. Build main JSON payload
         # ---------------------------------------------------------
         payload = {
             "generated_at": generated_at_iso,
             "count": len(ranked),
-            "best_opportunity": best,
+            "best_actionable_opportunity": (
+                best_actionable
+            ),
+            "top_unverified_opportunity": (
+                top_unverified
+            ),
             "next_actions": actions,
             "opportunities": ranked,
         }
 
         # ---------------------------------------------------------
-        # 8. Save current production outputs
+        # 10. Build actionable queue payload
+        # ---------------------------------------------------------
+        actionable_payload = {
+            "generated_at": generated_at_iso,
+            "summary": queue_summary,
+            "opportunities": actionable_queue,
+        }
+
+        # ---------------------------------------------------------
+        # 11. Save current production outputs
         # ---------------------------------------------------------
         save_to_json(
             payload,
@@ -177,14 +277,21 @@ def main() -> None:
             md_output_file,
         )
 
+        save_to_json(
+            actionable_payload,
+            actionable_queue_output,
+        )
+
         # ---------------------------------------------------------
-        # 9. Save immutable history snapshot
+        # 12. Save immutable history snapshot
         # ---------------------------------------------------------
-        history_json, history_csv, history_md = (
-            build_history_paths(
-                Path("opportunities"),
-                timestamp_label,
-            )
+        (
+            history_json,
+            history_csv,
+            history_md,
+        ) = build_history_paths(
+            Path("opportunities"),
+            timestamp_label,
         )
 
         save_to_json(
@@ -204,7 +311,7 @@ def main() -> None:
         )
 
         # ---------------------------------------------------------
-        # 10. Console summary
+        # 13. Console pipeline summary
         # ---------------------------------------------------------
         print(
             f"Loaded input from: "
@@ -226,17 +333,83 @@ def main() -> None:
             f"{len(verified)}"
         )
 
-        if best:
-            print("Best opportunity:")
+        # ---------------------------------------------------------
+        # 14. Actionable Queue summary
+        # ---------------------------------------------------------
+        print()
+        print("Actionable Queue Summary")
+
+        print(
+            f"Total: "
+            f"{queue_summary['total']}"
+        )
+
+        print(
+            f"Actionable: "
+            f"{queue_summary['actionable']}"
+        )
+
+        print(
+            f"Needs verification: "
+            f"{queue_summary['needs_verification']}"
+        )
+
+        print(
+            f"Blocked: "
+            f"{queue_summary['blocked']}"
+        )
+
+        # ---------------------------------------------------------
+        # 15. Best actionable opportunity
+        # ---------------------------------------------------------
+        print()
+        print(
+            "Best Actionable Opportunity:"
+        )
+
+        if best_actionable:
             print(
                 json.dumps(
-                    best,
+                    best_actionable,
                     indent=2,
                     ensure_ascii=False,
                 )
             )
+        else:
+            print("None")
 
-        print("Next 3 Actions:")
+        # ---------------------------------------------------------
+        # 16. Top opportunity needing verification
+        # ---------------------------------------------------------
+        print()
+
+        print(
+            "Top Opportunity "
+            "Needing Verification:"
+        )
+
+        if top_unverified:
+            print(
+                json.dumps(
+                    top_unverified,
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+        else:
+            print("None")
+
+        # ---------------------------------------------------------
+        # 17. Recommended actions
+        # ---------------------------------------------------------
+        print()
+
+        if best_actionable:
+            print("Next 3 Actions:")
+        elif top_unverified:
+            print("Verification Actions:")
+        else:
+            print("Next Actions:")
 
         for i, action in enumerate(
             actions,
@@ -246,6 +419,9 @@ def main() -> None:
                 f"{i}. {action}"
             )
 
+        # ---------------------------------------------------------
+        # 18. Saved output locations
+        # ---------------------------------------------------------
         print()
 
         print(
@@ -264,6 +440,11 @@ def main() -> None:
         )
 
         print(
+            f"Saved actionable queue to: "
+            f"{actionable_queue_output.resolve()}"
+        )
+
+        print(
             f"Saved history JSON to: "
             f"{history_json.resolve()}"
         )
@@ -279,15 +460,20 @@ def main() -> None:
         )
 
     except FileNotFoundError as e:
-        print(f"Error: {e}")
+        print(
+            f"Error: {e}"
+        )
+
         print()
         print(USAGE)
+
         sys.exit(1)
 
     except Exception as e:
         print(
             f"Unexpected error: {e}"
         )
+
         sys.exit(1)
 
 
