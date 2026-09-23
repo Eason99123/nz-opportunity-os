@@ -55,6 +55,7 @@ incoming/legacy_*.txt
 opportunities/deduplicated_ranked_output.json
 opportunities/opportunities.csv
 opportunities/weekly_summary.md
+opportunities/actionable_queue.json
 
 opportunities/history/
 opportunities/history_changes/
