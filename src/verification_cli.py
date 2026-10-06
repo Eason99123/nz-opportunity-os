@@ -284,7 +284,7 @@ def main() -> None:
             "Verification reason: "
         ).strip()
 
-        updated = apply_verification(
+        updated = apply_verification_result(
             selected,
             application_status=new_status,
             official_listing_present=(
